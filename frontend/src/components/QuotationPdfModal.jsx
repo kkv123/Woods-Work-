@@ -51,7 +51,7 @@ export default function QuotationPdfModal({ isOpen, onClose }) {
 
   // Default values matching the documents
   const [clientName, setClientName] = useState('Kolte Patil Developers Limited');
-  const [siteLocation, setSiteLocation] = useState('Main Site');
+  const [siteLocation, setSiteLocation] = useState('Life Republic / Hinjewadi Site');
   
   // Format current date as DD-MM-YYYY
   const getTodayFormatted = () => {
@@ -303,7 +303,7 @@ First coat Paint not complete.`
     setBulletStyle('twoDigitDot'); // Always 01. for all companies per user specification
     if (key === 'woods_work') {
       setClientName('Kolte Patil Developers Limited');
-      setSiteLocation('');
+      setSiteLocation('Life Republic / Hinjewadi Site');
       setGstExtra(false);
       setShowConcludingNote(true);
     } else {
@@ -1008,8 +1008,8 @@ First coat Paint not complete.`
                   <span className="border-b border-black/40 pb-0.5">{quoteDate}</span>
                 </div>
 
-                {/* 6. To: and site: details */}
-                <div className="space-y-1 text-[14.5px] font-sans text-black mb-5">
+                {/* 6. To: and Site: details (Parallel Left Alignment) */}
+                <div className="space-y-1.5 text-[14.5px] font-sans text-black mb-5">
                   <div className="leading-snug">
                     <span className="font-semibold text-black">To </span>
                   </div>
@@ -1019,7 +1019,7 @@ First coat Paint not complete.`
                     </span>
                   </div>
                   {siteLocation && (
-                    <div className="leading-snug pt-1 pl-4">
+                    <div className="leading-snug pt-0.5">
                       <span className="font-semibold text-black">Site: </span>
                       <span className="font-normal text-[14.5px] text-black">{siteLocation}</span>
                     </div>
