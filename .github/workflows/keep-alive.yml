@@ -1,0 +1,27 @@
+name: Backend Keep-Alive (Smart Business Hours)
+
+on:
+  schedule:
+    # Runs every 14 minutes between 02:00 UTC and 17:00 UTC (7:30 AM to 10:30 PM IST)
+    # Stays warm throughout business hours, sleeps at night to save Render free tier hours
+    - cron: '*/14 2-17 * * *'
+  workflow_dispatch: # Allows manual 1-click test trigger from the GitHub Actions tab
+
+jobs:
+  ping-backend:
+    name: Ping Render Health Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Ping Woods Work API Health Endpoint
+        run: |
+          echo "Pinging Woods Work Backend at https://woods-work.onrender.com/api/health"
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -m 60 "https://woods-work.onrender.com/api/health")
+          echo "$RESPONSE"
+          STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS" | cut -d':' -f2)
+          if [ "$STATUS" = "200" ]; then
+            echo "SUCCESS: Backend is warm, healthy, and operational."
+          else
+            echo "WARNING: Backend responded with HTTP $STATUS or was cold-starting."
+          fi
