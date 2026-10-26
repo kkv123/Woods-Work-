@@ -3,14 +3,13 @@ import {
   X, Download, Plus, Trash2, Printer, FileText, CheckCircle2, 
   Sparkles, RefreshCw, Eye, Edit3, Building, MapPin, Calendar, 
   PenTool, ArrowUp, ArrowDown, Copy, ListPlus, AlignLeft, 
-  Upload, RotateCcw, Check, Briefcase
+  Check, Briefcase
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 export default function QuotationPdfModal({ isOpen, onClose }) {
   const printRef = useRef(null);
-  const sigCanvasRef = useRef(null);
   const [downloading, setDownloading] = useState(false);
   const [entryMode, setEntryMode] = useState('structured'); // 'structured' or 'bulk'
 
@@ -112,76 +111,9 @@ First coat Paint not complete.`
   const [gstExtra, setGstExtra] = useState(false); // Can be toggled if commercial quotation
 
   // -------------------------------------------------------------
-  // Signature Options State
+  // Signature State (Clean & Simplified: Typed Signatory Name)
   // -------------------------------------------------------------
-  const [signatureType, setSignatureType] = useState('blank'); // 'blank', 'draw', 'upload', 'type'
-  const [drawnSigData, setDrawnSigData] = useState(null);
-  const [uploadedSigData, setUploadedSigData] = useState(null);
-  const [typedSigName, setTypedSigName] = useState('Inder');
-  const [inkColor, setInkColor] = useState('#1e3a8a'); // Blue ink by default
-  const [isDrawing, setIsDrawing] = useState(false);
-
-  // Canvas drawing setup
-  const startDrawing = (e) => {
-    const canvas = sigCanvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const rect = canvas.getBoundingClientRect();
-    
-    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-
-    ctx.beginPath();
-    ctx.moveTo(clientX - rect.left, clientY - rect.top);
-    ctx.strokeStyle = inkColor;
-    ctx.lineWidth = 2.2;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    setIsDrawing(true);
-  };
-
-  const draw = (e) => {
-    if (!isDrawing) return;
-    const canvas = sigCanvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const rect = canvas.getBoundingClientRect();
-
-    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-
-    ctx.lineTo(clientX - rect.left, clientY - rect.top);
-    ctx.stroke();
-  };
-
-  const stopDrawing = () => {
-    if (!isDrawing) return;
-    setIsDrawing(false);
-    const canvas = sigCanvasRef.current;
-    if (canvas) {
-      setDrawnSigData(canvas.toDataURL('image/png'));
-    }
-  };
-
-  const clearCanvas = () => {
-    const canvas = sigCanvasRef.current;
-    if (canvas) {
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      setDrawnSigData(null);
-    }
-  };
-
-  const handleSignatureUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setUploadedSigData(event.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const [typedSigName, setTypedSigName] = useState('Kuldeep Vishwakarma');
 
   if (!isOpen) return null;
 
@@ -740,145 +672,22 @@ First coat Paint not complete.`
               )}
             </div>
 
-            {/* Signature Options */}
-            <div className="space-y-3 pt-3 border-t border-stone-200 dark:border-[#2b1c12]">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300 flex items-center space-x-1.5">
-                  <PenTool className="w-3.5 h-3.5 text-red-600" />
-                  <span>Signature Option</span>
-                </label>
-
-                <div className="flex rounded-lg bg-stone-100 dark:bg-[#291c13] p-0.5 border border-stone-200 dark:border-[#382518] text-[10px] font-semibold">
-                  <button
-                    type="button"
-                    onClick={() => setSignatureType('blank')}
-                    className={`px-2 py-0.5 rounded transition-all ${
-                      signatureType === 'blank'
-                        ? 'bg-white dark:bg-[#140d08] text-red-600 shadow-xs'
-                        : 'text-stone-500'
-                    }`}
-                  >
-                    Leave Blank
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSignatureType('draw')}
-                    className={`px-2 py-0.5 rounded transition-all ${
-                      signatureType === 'draw'
-                        ? 'bg-white dark:bg-[#140d08] text-red-600 shadow-xs'
-                        : 'text-stone-500'
-                    }`}
-                  >
-                    Draw Pad
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSignatureType('upload')}
-                    className={`px-2 py-0.5 rounded transition-all ${
-                      signatureType === 'upload'
-                        ? 'bg-white dark:bg-[#140d08] text-red-600 shadow-xs'
-                        : 'text-stone-500'
-                    }`}
-                  >
-                    Upload
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSignatureType('type')}
-                    className={`px-2 py-0.5 rounded transition-all ${
-                      signatureType === 'type'
-                        ? 'bg-white dark:bg-[#140d08] text-red-600 shadow-xs'
-                        : 'text-stone-500'
-                    }`}
-                  >
-                    Type Name
-                  </button>
-                </div>
-              </div>
-
-              {signatureType === 'draw' && (
-                <div className="space-y-2 p-3 rounded-xl border border-stone-200 dark:border-[#382518] bg-stone-50/70 dark:bg-[#140d08]/70">
-                  <div className="flex items-center justify-between text-[11px] text-stone-500">
-                    <span>Draw signature:</span>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        type="button"
-                        onClick={() => setInkColor('#1e3a8a')}
-                        className={`w-4 h-4 rounded-full border-2 ${inkColor === '#1e3a8a' ? 'border-amber-500 scale-110' : 'border-transparent'}`}
-                        style={{ backgroundColor: '#1e3a8a' }}
-                        title="Blue Ink"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setInkColor('#000000')}
-                        className={`w-4 h-4 rounded-full border-2 ${inkColor === '#000000' ? 'border-amber-500 scale-110' : 'border-transparent'}`}
-                        style={{ backgroundColor: '#000000' }}
-                        title="Black Ink"
-                      />
-                      <button
-                        type="button"
-                        onClick={clearCanvas}
-                        className="text-[10px] text-red-600 hover:underline flex items-center space-x-0.5 cursor-pointer"
-                      >
-                        <RotateCcw className="w-3 h-3" />
-                        <span>Clear</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="bg-white rounded-lg border border-stone-300 dark:border-[#382518] overflow-hidden shadow-inner">
-                    <canvas
-                      ref={sigCanvasRef}
-                      width={380}
-                      height={90}
-                      onMouseDown={startDrawing}
-                      onMouseMove={draw}
-                      onMouseUp={stopDrawing}
-                      onMouseLeave={stopDrawing}
-                      onTouchStart={startDrawing}
-                      onTouchMove={draw}
-                      onTouchEnd={stopDrawing}
-                      className="w-full h-24 touch-none cursor-crosshair block"
-                      style={{ backgroundColor: '#ffffff' }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {signatureType === 'upload' && (
-                <div className="space-y-2 p-3 rounded-xl border border-stone-200 dark:border-[#382518] bg-stone-50/70 dark:bg-[#140d08]/70">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleSignatureUpload}
-                    className="block w-full text-xs text-stone-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
-                  />
-                  {uploadedSigData && (
-                    <div className="p-2 bg-white rounded border border-stone-200 flex items-center justify-between">
-                      <img src={uploadedSigData} alt="Uploaded signature" className="h-10 object-contain" />
-                      <button
-                        type="button"
-                        onClick={() => setUploadedSigData(null)}
-                        className="text-[10px] text-rose-600 hover:underline"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {signatureType === 'type' && (
-                <div className="space-y-2 p-3 rounded-xl border border-stone-200 dark:border-[#382518] bg-stone-50/70 dark:bg-[#140d08]/70">
-                  <input
-                    type="text"
-                    value={typedSigName}
-                    onChange={(e) => setTypedSigName(e.target.value)}
-                    placeholder="e.g. Inder"
-                    className="w-full px-3 py-1.5 rounded-lg border border-stone-300 dark:border-[#382518] bg-white dark:bg-[#1a120b] text-sm font-serif italic text-blue-900 focus:ring-1 focus:ring-red-500 outline-none"
-                  />
-                </div>
-              )}
+            {/* Signature Control (Simplified: Typed Name) */}
+            <div className="space-y-2 pt-3 border-t border-stone-200 dark:border-[#2b1c12]">
+              <label className="text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300 flex items-center space-x-1.5">
+                <PenTool className="w-3.5 h-3.5 text-red-600" />
+                <span>Authorized Signatory Name</span>
+              </label>
+              <input
+                type="text"
+                value={typedSigName}
+                onChange={(e) => setTypedSigName(e.target.value)}
+                placeholder="e.g. Kuldeep Vishwakarma"
+                className="w-full px-3 py-2 rounded-xl border border-stone-300 dark:border-[#382518] bg-stone-50 dark:bg-[#140d08] text-stone-900 dark:text-white text-xs font-semibold focus:ring-2 focus:ring-red-500 outline-none transition-all"
+              />
+              <p className="text-[11px] text-stone-500 dark:text-stone-400">
+                Stylized digital signature rendered automatically on the letterhead.
+              </p>
             </div>
 
             {/* GST Controls */}
@@ -1066,41 +875,22 @@ First coat Paint not complete.`
 
               {/* 10. Signature Block (Right Aligned) */}
               <div className="flex justify-end pt-6 pb-2">
-                <div className="text-right min-w-[190px]">
+                <div className="text-right min-w-[200px]">
                   
-                  {/* Signature Zone Based on Selected Mode */}
-                  <div className="h-14 flex items-end justify-end mb-1 relative">
-                    
-                    {signatureType === 'draw' && drawnSigData && (
-                      <img 
-                        src={drawnSigData} 
-                        alt="Owner Signature" 
-                        className="max-h-12 max-w-[160px] object-contain select-none" 
-                      />
-                    )}
-
-                    {signatureType === 'upload' && uploadedSigData && (
-                      <img 
-                        src={uploadedSigData} 
-                        alt="Owner Signature" 
-                        className="max-h-12 max-w-[160px] object-contain select-none" 
-                      />
-                    )}
-
-                    {signatureType === 'type' && (
+                  {/* Stylized Signature */}
+                  <div className="h-12 flex items-end justify-end mb-1">
+                    {typedSigName ? (
                       <span 
-                        className="text-2xl font-serif italic tracking-wider select-none font-bold transform -rotate-3 mr-2"
+                        className="text-2xl font-serif italic tracking-wider select-none font-bold transform -rotate-2 mr-2"
                         style={{ 
                           fontFamily: "'Brush Script MT', 'Dancing Script', 'Caveat', cursive, serif",
-                          color: inkColor
+                          color: '#1e3a8a'
                         }}
                       >
-                        {typedSigName || 'Inder'}
+                        {typedSigName}
                       </span>
-                    )}
-
-                    {signatureType === 'blank' && (
-                      <div className="w-full h-12" />
+                    ) : (
+                      <div className="h-8" />
                     )}
                   </div>
 
