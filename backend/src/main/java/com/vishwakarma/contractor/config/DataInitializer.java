@@ -51,26 +51,11 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // Seed Enterprise Admin Users (BCrypt salted hash in Supabase Postgres)
-        if (userRepository.count() == 0) {
-            String encodedPassword = passwordEncoder.encode(initialAdminPassword);
+        // Seed & Ensure Enterprise Admin & Demo Accounts (BCrypt salted hash in Supabase Postgres)
+        seedUserIfMissing("contractor@vishwakarmawoods.com", initialAdminPassword, "Kuldeep Vishwakarma (Contractor Owner)", "ROLE_ADMIN");
+        seedUserIfMissing("admin", initialAdminPassword, "Master Woodcraft Admin", "ROLE_ADMIN");
+        seedUserIfMissing("demo", "Demo@2026", "Hiring Team / Recruiter Demo", "ROLE_ADMIN");
 
-            userRepository.save(new AppUser(
-                    "contractor@vishwakarmawoods.com",
-                    encodedPassword,
-                    "Kuldeep Vishwakarma (Contractor Owner)",
-                    "ROLE_ADMIN"
-            ));
-
-            userRepository.save(new AppUser(
-                    "admin",
-                    encodedPassword,
-                    "Master Woodcraft Admin",
-                    "ROLE_ADMIN"
-            ));
-
-            System.out.println(">>> Initialized Enterprise BCrypt Admin Accounts in Supabase DB.");
-        }
         if (employeeRepository.count() == 0) {
             employeeRepository.save(new Employee(
                     "Ramesh Sharma", "+91 98210 44101", "+91 98210 99991",
@@ -226,5 +211,25 @@ public class DataInitializer implements CommandLineRunner {
             ));
             System.out.println(">>> Initialized sample material expenses.");
         }
+    }
+
+    private void seedUserIfMissing(String username, String plainPassword, String fullName, String role) {
+        userRepository.findByUsername(username).ifPresentOrElse(
+                existing -> {
+                    // Update password to ensure it matches the current environment configuration
+                    existing.setPassword(passwordEncoder.encode(plainPassword));
+                    existing.setFullName(fullName);
+                    userRepository.save(existing);
+                },
+                () -> {
+                    userRepository.save(new AppUser(
+                            username,
+                            passwordEncoder.encode(plainPassword),
+                            fullName,
+                            role
+                    ));
+                    System.out.println(">>> Created user account: " + username);
+                }
+        );
     }
 }
