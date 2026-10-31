@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import ServicesSection from './components/ServicesSection';
@@ -10,25 +10,32 @@ import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
 import AdminLoginModal from './components/AdminLoginModal';
 import AdminPortal from './components/AdminPortal';
+import { useAuth } from './context/useAuth';
 
 export default function App() {
-  // Support direct URL access via http://localhost:5173/#admin
-  const [isAdminView, setIsAdminView] = useState(() => {
-    return typeof window !== 'undefined' && window.location.hash === '#admin';
-  });
+  const { isAuthenticated } = useAuth();
+  const [currentHash, setCurrentHash] = useState(() => (typeof window !== 'undefined' ? window.location.hash : ''));
   const [adminModalOpen, setAdminModalOpen] = useState(false);
   const [preselectedService, setPreselectedService] = useState(null);
 
-  // Sync hash changes
-  React.useEffect(() => {
+  // Sync hash changes & protect #admin route
+  useEffect(() => {
     const handleHashChange = () => {
-      if (window.location.hash === '#admin') {
-        setIsAdminView(true);
+      const hash = window.location.hash;
+      setCurrentHash(hash);
+      if (hash === '#admin' && !isAuthenticated) {
+        // Intercept unauthorized access: prompt login modal and do not render admin portal
+        setAdminModalOpen(true);
       }
     };
+
     window.addEventListener('hashchange', handleHashChange);
+    // Check initial load
+    if (window.location.hash === '#admin' && !isAuthenticated) {
+      setAdminModalOpen(true);
+    }
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
+  }, [isAuthenticated]);
 
   const handleSelectServiceForEstimator = (serviceId) => {
     setPreselectedService(serviceId);
@@ -39,14 +46,14 @@ export default function App() {
   };
 
   const handleExitAdmin = () => {
-    setIsAdminView(false);
     if (window.location.hash === '#admin') {
       window.history.pushState(null, '', window.location.pathname);
+      setCurrentHash('');
     }
   };
 
-  // If contractor logged into Admin Portal
-  if (isAdminView) {
+  // Strictly protected: Only render AdminPortal if user is fully authenticated with real JWT token
+  if (isAuthenticated && currentHash === '#admin') {
     return <AdminPortal onClose={handleExitAdmin} />;
   }
 
@@ -54,7 +61,14 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#faf8f5] dark:bg-[#140d08] text-stone-900 dark:text-[#f6f1e8] flex flex-col font-sans selection:bg-[#ebe2d2] dark:selection:bg-amber-950 selection:text-[#2b1a0e] dark:selection:text-amber-200 transition-colors duration-200">
       {/* Navigation with Theme Switcher & Admin Portal Hook */}
-      <Navbar onOpenAdmin={() => setAdminModalOpen(true)} />
+      <Navbar onOpenAdmin={() => {
+        if (isAuthenticated) {
+          window.location.hash = '#admin';
+          setCurrentHash('#admin');
+        } else {
+          setAdminModalOpen(true);
+        }
+      }} />
 
       {/* Main Content */}
       <main className="flex-grow">
@@ -87,7 +101,10 @@ export default function App() {
       <AdminLoginModal
         isOpen={adminModalOpen}
         onClose={() => setAdminModalOpen(false)}
-        onLoginSuccess={() => setIsAdminView(true)}
+        onLoginSuccess={() => {
+          window.location.hash = '#admin';
+          setCurrentHash('#admin');
+        }}
       />
     </div>
   );

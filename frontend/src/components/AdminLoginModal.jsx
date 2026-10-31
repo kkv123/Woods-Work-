@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 import { X, Lock, Mail, ArrowRight, ShieldCheck, Eye, EyeOff, AlertCircle, Sparkles, CheckCircle2, KeyRound } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
 
-export default function AdminLoginModal({ isOpen, onClose }) {
+export default function AdminLoginModal({ isOpen, onClose, onLoginSuccess }) {
   // Pre-filled by default for instant recruiter & interviewer testing
   const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('Admin@Secure2026');
+  const [password, setPassword] = useState('Kuldeep@902285');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
 
   const { loginWithPassword } = useAuth();
 
-  const handleDirectDemoLogin = async (demoUser = 'admin', demoPass = 'Admin@Secure2026') => {
+  const handleDirectDemoLogin = async (demoUser = 'admin', demoPass = 'Kuldeep@902285') => {
     setUsername(demoUser);
     setPassword(demoPass);
     setErrorMsg('');
@@ -21,6 +21,7 @@ export default function AdminLoginModal({ isOpen, onClose }) {
       await loginWithPassword(demoUser, demoPass);
       setLoading(false);
       onClose();
+      if (onLoginSuccess) onLoginSuccess();
       window.location.hash = '#admin';
     } catch (err) {
       setLoading(false);
@@ -45,7 +46,7 @@ export default function AdminLoginModal({ isOpen, onClose }) {
       await loginWithPassword(username, password);
       setLoading(false);
       onClose();
-      // Redirect to #admin
+      if (onLoginSuccess) onLoginSuccess();
       window.location.hash = '#admin';
     } catch (err) {
       setLoading(false);
@@ -100,7 +101,7 @@ export default function AdminLoginModal({ isOpen, onClose }) {
           {/* Primary 1-Click Direct Login Button */}
           <button
             type="button"
-            onClick={() => handleDirectDemoLogin('admin', 'Admin@Secure2026')}
+            onClick={() => handleDirectDemoLogin('admin', 'Kuldeep@902285')}
             disabled={loading}
             className="w-full py-2.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 group cursor-pointer"
           >
@@ -110,7 +111,7 @@ export default function AdminLoginModal({ isOpen, onClose }) {
 
           <div className="flex justify-between items-center text-[10px] text-stone-500 dark:text-stone-400 px-1 font-mono">
             <span>Pre-filled credentials below:</span>
-            <span className="text-stone-700 dark:text-stone-200 font-bold">admin / Admin@Secure2026</span>
+            <span className="text-stone-700 dark:text-stone-200 font-bold">admin / Kuldeep@902285</span>
           </div>
         </div>
 

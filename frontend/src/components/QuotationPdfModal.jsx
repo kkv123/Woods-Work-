@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  X, Download, Plus, Trash2, Printer, FileText, CheckCircle2, 
-  Sparkles, RefreshCw, Eye, Edit3, Building, MapPin, Calendar, 
-  PenTool, ArrowUp, ArrowDown, Copy, ListPlus, AlignLeft, 
+import {
+  X, Download, Plus, Trash2, Printer, FileText, CheckCircle2,
+  Sparkles, RefreshCw, Eye, Edit3, Building, MapPin, Calendar,
+  PenTool, ArrowUp, ArrowDown, Copy, ListPlus, AlignLeft,
   Check, Briefcase
 } from 'lucide-react';
 import jsPDF from 'jspdf';
@@ -51,7 +51,7 @@ export default function QuotationPdfModal({ isOpen, onClose }) {
   // Default values matching the documents
   const [clientName, setClientName] = useState('Kolte Patil Developers Limited');
   const [siteLocation, setSiteLocation] = useState('Life Republic / Hinjewadi Site');
-  
+
   // Format current date as DD-MM-YYYY
   const getTodayFormatted = () => {
     const today = new Date();
@@ -101,7 +101,7 @@ export default function QuotationPdfModal({ isOpen, onClose }) {
 
   // Bulk paste text buffer
   const [bulkText, setBulkText] = useState(
-`Window work Not complete.
+    `Window work Not complete.
 
 Acid wash not complete.
 
@@ -113,7 +113,7 @@ First coat Paint not complete.`
   // -------------------------------------------------------------
   // Signature State (Clean & Simplified: Typed Signatory Name)
   // -------------------------------------------------------------
-  const [typedSigName, setTypedSigName] = useState('Kuldeep Vishwakarma');
+  const [typedSigName, setTypedSigName] = useState('Kuldeep');
 
   if (!isOpen) return null;
 
@@ -253,16 +253,16 @@ First coat Paint not complete.`
 
     try {
       const element = printRef.current;
-      
+
       const canvas = await html2canvas(element, {
-        scale: 3, 
+        scale: 3,
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff'
       });
 
       const imgData = canvas.toDataURL('image/jpeg', 1.0);
-      
+
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -272,7 +272,7 @@ First coat Paint not complete.`
       const imgWidth = 210;
       const pageHeight = 297;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
+
       let heightLeft = imgHeight;
       let position = 0;
 
@@ -300,7 +300,7 @@ First coat Paint not complete.`
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-stone-950/80 backdrop-blur-md animate-fadeIn overflow-y-auto">
       <div className="relative w-full max-w-6xl max-h-[96vh] bg-white dark:bg-[#1a120b] border border-stone-300 dark:border-[#382518] rounded-2xl shadow-2xl flex flex-col overflow-hidden text-left my-auto">
-        
+
         {/* Modal Top Bar */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 dark:border-[#2b1c12] bg-stone-50 dark:bg-[#140d08]">
           <div className="flex items-center space-x-3">
@@ -347,10 +347,10 @@ First coat Paint not complete.`
 
         {/* Modal Body: Editor on Left, Live A4 Document on Right */}
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-y-auto">
-          
+
           {/* LEFT: Input Form Controls */}
           <div className="lg:col-span-5 p-5 sm:p-6 space-y-5 border-r border-stone-200 dark:border-[#2b1c12] bg-white dark:bg-[#1a120b] overflow-y-auto max-h-[85vh]">
-            
+
             {/* 1. COMPANY ENTITY SELECTOR (Switch between Woods Work & Enterprises) */}
             <div className="space-y-1.5 p-3 rounded-xl bg-red-50/60 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40">
               <label className="block text-xs font-black uppercase tracking-wider text-red-900 dark:text-red-300">
@@ -360,11 +360,10 @@ First coat Paint not complete.`
                 <button
                   type="button"
                   onClick={() => handleCompanyChange('woods_work')}
-                  className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
-                    selectedCompanyKey === 'woods_work'
+                  className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${selectedCompanyKey === 'woods_work'
                       ? 'border-red-600 bg-white dark:bg-[#140d08] text-red-600 shadow-sm ring-2 ring-red-500/20'
                       : 'border-stone-300 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:bg-white/60'
-                  }`}
+                    }`}
                 >
                   <div className="text-xs font-black">VISHWAKARMA WOODS WORK</div>
                   <div className="text-[10px] font-mono text-stone-500 mt-0.5">GST: 27APHPV6529H1ZC</div>
@@ -373,11 +372,10 @@ First coat Paint not complete.`
                 <button
                   type="button"
                   onClick={() => handleCompanyChange('enterprises')}
-                  className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
-                    selectedCompanyKey === 'enterprises'
+                  className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${selectedCompanyKey === 'enterprises'
                       ? 'border-red-600 bg-white dark:bg-[#140d08] text-red-600 shadow-sm ring-2 ring-red-500/20'
                       : 'border-stone-300 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:bg-white/60'
-                  }`}
+                    }`}
                 >
                   <div className="text-xs font-black">VISHWAKARMA ENTERPRISES</div>
                   <div className="text-[10px] font-mono text-stone-500 mt-0.5">GST: 27AWUPV4157F1ZT</div>
@@ -430,24 +428,23 @@ First coat Paint not complete.`
 
             {/* Bullet Points Management Section */}
             <div className="space-y-3 pt-2 border-t border-stone-200 dark:border-[#2b1c12]">
-              
+
               <div className="flex items-center justify-between">
                 <div>
                   <label className="text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300 block">
                     Points & Observations ({bulletPoints.length} Items)
                   </label>
                 </div>
-                
+
                 {/* Switch between Step-by-Step and Bulk Paste */}
                 <div className="flex rounded-lg bg-stone-100 dark:bg-[#291c13] p-0.5 border border-stone-200 dark:border-[#382518] text-[11px] font-semibold">
                   <button
                     type="button"
                     onClick={() => setEntryMode('structured')}
-                    className={`px-2.5 py-1 rounded-md transition-all flex items-center space-x-1 ${
-                      entryMode === 'structured'
+                    className={`px-2.5 py-1 rounded-md transition-all flex items-center space-x-1 ${entryMode === 'structured'
                         ? 'bg-white dark:bg-[#140d08] text-red-600 shadow-xs'
                         : 'text-stone-500 hover:text-stone-800'
-                    }`}
+                      }`}
                   >
                     <ListPlus className="w-3 h-3" />
                     <span>Point by Point</span>
@@ -455,11 +452,10 @@ First coat Paint not complete.`
                   <button
                     type="button"
                     onClick={() => setEntryMode('bulk')}
-                    className={`px-2.5 py-1 rounded-md transition-all flex items-center space-x-1 ${
-                      entryMode === 'bulk'
+                    className={`px-2.5 py-1 rounded-md transition-all flex items-center space-x-1 ${entryMode === 'bulk'
                         ? 'bg-white dark:bg-[#140d08] text-red-600 shadow-xs'
                         : 'text-stone-500 hover:text-stone-800'
-                    }`}
+                      }`}
                   >
                     <AlignLeft className="w-3 h-3" />
                     <span>Paste Multi-Lines</span>
@@ -476,11 +472,10 @@ First coat Paint not complete.`
                   <button
                     type="button"
                     onClick={() => setBulletStyle('twoDigitDot')}
-                    className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all cursor-pointer ${
-                      bulletStyle === 'twoDigitDot'
+                    className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all cursor-pointer ${bulletStyle === 'twoDigitDot'
                         ? 'bg-red-600 text-white shadow-xs'
                         : 'text-stone-600 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800'
-                    }`}
+                      }`}
                     title="01., 02., 03. (From Kolte Patil document)"
                   >
                     01.
@@ -488,11 +483,10 @@ First coat Paint not complete.`
                   <button
                     type="button"
                     onClick={() => setBulletStyle('numberDot')}
-                    className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all cursor-pointer ${
-                      bulletStyle === 'numberDot'
+                    className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all cursor-pointer ${bulletStyle === 'numberDot'
                         ? 'bg-red-600 text-white shadow-xs'
                         : 'text-stone-600 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800'
-                    }`}
+                      }`}
                     title="Formal Numeric: 1., 2., 3."
                   >
                     1.
@@ -500,11 +494,10 @@ First coat Paint not complete.`
                   <button
                     type="button"
                     onClick={() => setBulletStyle('bracket')}
-                    className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all cursor-pointer ${
-                      bulletStyle === 'bracket'
+                    className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all cursor-pointer ${bulletStyle === 'bracket'
                         ? 'bg-red-600 text-white shadow-xs'
                         : 'text-stone-600 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800'
-                    }`}
+                      }`}
                     title="Letterhead Bracket: 1}, 2}, 3}"
                   >
                     1&#125;
@@ -512,11 +505,10 @@ First coat Paint not complete.`
                   <button
                     type="button"
                     onClick={() => setBulletStyle('romanUpper')}
-                    className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all cursor-pointer ${
-                      bulletStyle === 'romanUpper'
+                    className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all cursor-pointer ${bulletStyle === 'romanUpper'
                         ? 'bg-red-600 text-white shadow-xs'
                         : 'text-stone-600 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800'
-                    }`}
+                      }`}
                     title="Formal Roman: I., II., III."
                   >
                     I.
@@ -524,11 +516,10 @@ First coat Paint not complete.`
                   <button
                     type="button"
                     onClick={() => setBulletStyle('dot')}
-                    className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all cursor-pointer ${
-                      bulletStyle === 'dot'
+                    className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all cursor-pointer ${bulletStyle === 'dot'
                         ? 'bg-red-600 text-white shadow-xs'
                         : 'text-stone-600 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800'
-                    }`}
+                      }`}
                     title="Bullet Dot: •"
                   >
                     &bull;
@@ -541,8 +532,8 @@ First coat Paint not complete.`
                 <div className="space-y-3">
                   <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
                     {bulletPoints.map((item, index) => (
-                      <div 
-                        key={index} 
+                      <div
+                        key={index}
                         className="p-3 rounded-xl border border-stone-200 dark:border-[#382518] bg-stone-50/70 dark:bg-[#140d08]/70 space-y-2 relative group hover:border-red-400 transition-colors"
                       >
                         <div className="flex items-center justify-between">
@@ -726,21 +717,21 @@ First coat Paint not complete.`
 
           {/* RIGHT: Live High-Fidelity A4 Paper Preview */}
           <div className="lg:col-span-7 p-4 sm:p-6 bg-stone-200/70 dark:bg-stone-950 flex flex-col items-center justify-start overflow-y-auto max-h-[85vh]">
-            
+
             <div className="text-[11px] font-bold uppercase tracking-wider text-stone-500 mb-2 flex items-center space-x-1.5">
               <Eye className="w-3.5 h-3.5" />
               <span>Exact Letterhead Preview ({currentCompany.displayName})</span>
             </div>
 
             {/* Printable A4 Canvas Container */}
-            <div 
+            <div
               ref={printRef}
               className="w-full max-w-[595px] min-h-[842px] bg-white text-black shadow-2xl rounded-xs px-10 py-8 font-sans relative border border-stone-300 text-left select-none flex flex-col justify-between"
               style={{ backgroundColor: '#ffffff', color: '#000000', fontFamily: 'Arial, Helvetica, sans-serif' }}
             >
               <div>
                 {/* 1. Auspicious Invocation: || श्री || */}
-                <div 
+                <div
                   className="text-center font-bold text-[11px] mb-1 leading-none"
                   style={{ color: '#b91c1c' }}
                 >
@@ -748,10 +739,10 @@ First coat Paint not complete.`
                 </div>
 
                 {/* 2. Bold Red Company Name (Exact Serif Roman Letterhead Typography from Uploaded Scan) */}
-                <div 
+                <div
                   className="text-center uppercase leading-tight mb-2 whitespace-nowrap overflow-visible"
-                  style={{ 
-                    color: '#b21016', 
+                  style={{
+                    color: '#b21016',
                     fontFamily: "'Times New Roman', 'Georgia', 'Palatino Linotype', serif",
                     fontWeight: 800,
                     fontSize: selectedCompanyKey === 'woods_work' ? '25.5px' : '26px',
@@ -763,14 +754,14 @@ First coat Paint not complete.`
                 </div>
 
                 {/* 3. Address & Tax Info (Exact Letterhead Scale & Compact Print Ratio) */}
-                <div 
-                  className="text-center text-[10px] leading-tight mb-2 font-sans" 
+                <div
+                  className="text-center text-[10px] leading-tight mb-2 font-sans"
                   style={{ color: '#000000', fontFamily: 'Arial, Helvetica, sans-serif' }}
                 >
                   <div className="font-normal">
                     {currentCompany.address}
                   </div>
-                  
+
                   {currentCompany.layoutOrder === 'email_first' ? (
                     <>
                       <div className="mt-0.5">
@@ -876,13 +867,13 @@ First coat Paint not complete.`
               {/* 10. Signature Block (Right Aligned) */}
               <div className="flex justify-end pt-6 pb-2">
                 <div className="text-right min-w-[200px]">
-                  
+
                   {/* Stylized Signature */}
                   <div className="h-12 flex items-end justify-end mb-1">
                     {typedSigName ? (
-                      <span 
+                      <span
                         className="text-2xl font-serif italic tracking-wider select-none font-bold transform -rotate-2 mr-2"
-                        style={{ 
+                        style={{
                           fontFamily: "'Brush Script MT', 'Dancing Script', 'Caveat', cursive, serif",
                           color: '#1e3a8a'
                         }}

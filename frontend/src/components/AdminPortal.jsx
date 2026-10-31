@@ -76,6 +76,7 @@ export default function AdminPortal({ onClose }) {
 
   // Load data from Spring Boot API & Supabase
   const loadData = async () => {
+    if (!isAuthenticated) return;
     setLoading(true);
     const isOnline = await api.checkHealth();
     setBackendOnline(isOnline);
@@ -97,8 +98,10 @@ export default function AdminPortal({ onClose }) {
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (isAuthenticated) {
+      loadData();
+    }
+  }, [isAuthenticated]);
 
   // Worker Save
   const handleSaveWorker = async (e) => {

@@ -7,45 +7,17 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize session from sessionStorage or verify with backend
+  // Initialize session - strictly in-memory (no tokens stored in sessionStorage or localStorage to prevent theft)
   useEffect(() => {
-    const initAuth = async () => {
-      const savedToken = sessionStorage.getItem('vww_access_token');
-      const savedProfile = sessionStorage.getItem('vww_user_profile');
-
-      if (savedToken && savedProfile) {
-        try {
-          const profile = JSON.parse(savedProfile);
-          setUser(profile);
-          setToken(savedToken);
-
-          // Verify token validity with backend
-          const me = await api.getMe();
-          if (me) {
-            setUser(me);
-          } else {
-            // Attempt silent refresh
-            const refreshed = await refreshAccessToken();
-            if (refreshed) {
-              setToken(refreshed);
-              const reMe = await api.getMe();
-              if (reMe) setUser(reMe);
-            } else {
-              api.logout();
-              setUser(null);
-              setToken(null);
-            }
-          }
-        } catch (e) {
-          api.logout();
-          setUser(null);
-          setToken(null);
-        }
-      }
-      setLoading(false);
-    };
-
-    initAuth();
+    // Clear any residual storage in browser
+    try {
+      sessionStorage.removeItem('vww_access_token');
+      sessionStorage.removeItem('vww_refresh_token');
+      sessionStorage.removeItem('vww_user_profile');
+      localStorage.removeItem('vww_auth_token');
+      localStorage.removeItem('vww_user_profile');
+    } catch (e) {}
+    setLoading(false);
   }, []);
 
   // Silent automatic refresh loop: refreshes token every 12 minutes while active

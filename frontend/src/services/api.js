@@ -5,32 +5,71 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ?
 import { COMPLETED_PROJECTS } from '../data/mockData';
 import { INITIAL_EMPLOYEES, INITIAL_PROJECTS } from './mockFallback';
 
-// Helper to get authentication headers using short-lived 15-minute Access Token
+// Secure In-Memory Token Management
+// Tokens are strictly held in private memory variables to prevent token theft via sessionStorage / localStorage XSS
+let memoryAccessToken = null;
+let memoryRefreshToken = null;
+let memoryUserProfile = null;
+
+export function setMemoryAuth(accessToken, refreshToken, userProfile) {
+  memoryAccessToken = accessToken;
+  memoryRefreshToken = refreshToken;
+  memoryUserProfile = userProfile;
+  // Ensure no sensitive tokens reside in browser storage
+  try {
+    sessionStorage.removeItem('vww_access_token');
+    sessionStorage.removeItem('vww_refresh_token');
+    sessionStorage.removeItem('vww_user_profile');
+    localStorage.removeItem('vww_auth_token');
+    localStorage.removeItem('vww_user_profile');
+  } catch (e) {}
+}
+
+export function getMemoryAccessToken() {
+  return memoryAccessToken;
+}
+
+export function getMemoryUserProfile() {
+  return memoryUserProfile;
+}
+
+export function clearMemoryAuth() {
+  memoryAccessToken = null;
+  memoryRefreshToken = null;
+  memoryUserProfile = null;
+  try {
+    sessionStorage.removeItem('vww_access_token');
+    sessionStorage.removeItem('vww_refresh_token');
+    sessionStorage.removeItem('vww_user_profile');
+    localStorage.removeItem('vww_auth_token');
+    localStorage.removeItem('vww_user_profile');
+  } catch (e) {}
+}
+
+// Helper to get authentication headers using in-memory Access Token
 export function getAuthHeaders() {
-  const token = sessionStorage.getItem('vww_access_token') || localStorage.getItem('vww_auth_token');
   const headers = { 'Content-Type': 'application/json' };
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+  if (memoryAccessToken) {
+    headers['Authorization'] = `Bearer ${memoryAccessToken}`;
   }
   return headers;
 }
 
-// Seamless Refresh Token mechanism: exchanges refresh token for a fresh 15-min access token
+// Seamless Refresh Token mechanism using in-memory Refresh Token
 export async function refreshAccessToken() {
-  const refreshToken = sessionStorage.getItem('vww_refresh_token');
-  if (!refreshToken) return null;
+  if (!memoryRefreshToken) return null;
 
   try {
     const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken })
+      body: JSON.stringify({ refreshToken: memoryRefreshToken })
     });
 
     if (res.ok) {
       const data = await res.json();
       if (data.accessToken) {
-        sessionStorage.setItem('vww_access_token', data.accessToken);
+        memoryAccessToken = data.accessToken;
         return data.accessToken;
       }
     }
@@ -38,12 +77,8 @@ export async function refreshAccessToken() {
     // Network or server error
   }
 
-  // Refresh token is expired or revoked: wipe session
-  sessionStorage.removeItem('vww_access_token');
-  sessionStorage.removeItem('vww_refresh_token');
-  sessionStorage.removeItem('vww_user_profile');
-  localStorage.removeItem('vww_auth_token');
-  localStorage.removeItem('vww_user_profile');
+  // Refresh token is expired or revoked: wipe in-memory session
+  clearMemoryAuth();
   return null;
 }
 
@@ -111,63 +146,27 @@ async function authenticatedFetch(url, options = {}) {
 }
 
 export const api = {
-  // Authentication API (Dual-Token Architecture: 15-min Access Token + DB Refresh Token)
+  // Authentication API (In-Memory Token Security)
   login: async (username, password) => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || 'Authentication failed. Please verify credentials.');
-      }
-      const data = await res.json();
-
-      // Store in sessionStorage (auto-cleared on browser tab close)
-      if (data.accessToken) {
-        sessionStorage.setItem('vww_access_token', data.accessToken);
-      }
-      if (data.refreshToken) {
-        sessionStorage.setItem('vww_refresh_token', data.refreshToken);
-      }
-      sessionStorage.setItem('vww_user_profile', JSON.stringify({
-        username: data.username,
-        fullName: data.fullName,
-        role: data.role
-      }));
-
-      // Clean up any old localStorage tokens
-      localStorage.removeItem('vww_auth_token');
-      localStorage.removeItem('vww_user_profile');
-
-      return data;
-    } catch (err) {
-      // If network fails (backend cold-start on Render or offline), allow verified demo credentials
-      const isDemoMatch = (username === 'demo' && (password === 'Demo@2026' || password === 'Admin@Secure2026')) ||
-                          (username === 'admin' && (password === 'Admin@Secure2026' || password === 'Demo@2026')) ||
-                          (username === 'contractor@vishwakarmawoods.com' && (password === 'Admin@Secure2026' || password === 'Demo@2026'));
-
-      if (isDemoMatch) {
-        const demoData = {
-          accessToken: 'vww_demo_token_' + Date.now(),
-          refreshToken: 'vww_demo_refresh_' + Date.now(),
-          username: username,
-          fullName: username === 'demo' ? 'Hiring Team / Recruiter Demo' : 'Master Woodcraft Admin',
-          role: 'ROLE_ADMIN'
-        };
-        sessionStorage.setItem('vww_access_token', demoData.accessToken);
-        sessionStorage.setItem('vww_refresh_token', demoData.refreshToken);
-        sessionStorage.setItem('vww_user_profile', JSON.stringify({
-          username: demoData.username,
-          fullName: demoData.fullName,
-          role: demoData.role
-        }));
-        return demoData;
-      }
-      throw err;
+    const res = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || 'Authentication failed. Please verify credentials.');
     }
+    const data = await res.json();
+
+    // Store in-memory only (never saved to sessionStorage/localStorage to prevent theft)
+    setMemoryAuth(data.accessToken, data.refreshToken, {
+      username: data.username,
+      fullName: data.fullName,
+      role: data.role
+    });
+
+    return data;
   },
 
   getMe: async () => {
@@ -181,7 +180,7 @@ export const api = {
   },
 
   logout: async () => {
-    const refreshToken = sessionStorage.getItem('vww_refresh_token');
+    const refreshToken = memoryRefreshToken;
     try {
       if (refreshToken) {
         await fetch(`${API_BASE_URL}/auth/logout`, {
@@ -192,12 +191,8 @@ export const api = {
       }
     } catch (e) {}
 
-    // Complete client wipe
-    sessionStorage.removeItem('vww_access_token');
-    sessionStorage.removeItem('vww_refresh_token');
-    sessionStorage.removeItem('vww_user_profile');
-    localStorage.removeItem('vww_auth_token');
-    localStorage.removeItem('vww_user_profile');
+    // Complete in-memory wipe
+    clearMemoryAuth();
   },
 
   // Employees API
