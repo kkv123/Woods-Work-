@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Lock, Mail, ShieldCheck, Eye, EyeOff, AlertCircle, KeyRound } from 'lucide-react';
+import { X, Lock, Mail, ShieldCheck, Eye, EyeOff, AlertCircle, KeyRound, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
 
 export default function AdminLoginModal({ isOpen, onClose, onLoginSuccess }) {
