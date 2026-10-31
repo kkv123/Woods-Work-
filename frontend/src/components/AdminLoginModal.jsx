@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Lock, Mail, ArrowRight, ShieldCheck, Eye, EyeOff, AlertCircle, Sparkles, CheckCircle2, KeyRound } from 'lucide-react';
+import { X, Lock, Mail, ShieldCheck, Eye, EyeOff, AlertCircle, KeyRound } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
 
 export default function AdminLoginModal({ isOpen, onClose, onLoginSuccess }) {
@@ -11,29 +11,6 @@ export default function AdminLoginModal({ isOpen, onClose, onLoginSuccess }) {
   const [loading, setLoading] = useState(false);
 
   const { loginWithPassword } = useAuth();
-
-  const handleDirectDemoLogin = async (demoUser = 'admin', demoPass = 'Kuldeep@902285') => {
-    setUsername(demoUser);
-    setPassword(demoPass);
-    setErrorMsg('');
-    setLoading(true);
-    try {
-      await loginWithPassword(demoUser, demoPass);
-      setLoading(false);
-      onClose();
-      if (onLoginSuccess) onLoginSuccess();
-      window.location.hash = '#admin';
-    } catch (err) {
-      setLoading(false);
-      setErrorMsg(err.message || 'Invalid contractor credentials. Please try again.');
-    }
-  };
-
-  const fillTestCredentials = (user, pass) => {
-    setUsername(user);
-    setPassword(pass);
-    setErrorMsg('');
-  };
 
   if (!isOpen) return null;
 
@@ -85,33 +62,6 @@ export default function AdminLoginModal({ isOpen, onClose, onLoginSuccess }) {
           <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
           <div className="leading-relaxed">
             <span className="font-semibold">BCrypt Salted Hash + JWT:</span> Passwords are never stored in plain text. Verified directly against Supabase PostgreSQL.
-          </div>
-        </div>
-
-        {/* Recruiter & Interviewer 1-Click Quick Access Box */}
-        <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-500/15 via-emerald-500/10 to-indigo-500/15 border border-amber-500/40 dark:border-amber-500/30 space-y-2.5">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
-              Recruiter & Interviewer Access
-            </span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-semibold font-mono">Pre-filled</span>
-          </div>
-
-          {/* Primary 1-Click Direct Login Button */}
-          <button
-            type="button"
-            onClick={() => handleDirectDemoLogin('admin', 'Kuldeep@902285')}
-            disabled={loading}
-            className="w-full py-2.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 group cursor-pointer"
-          >
-            <span>⚡ 1-Click Direct Demo Login</span>
-            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-          </button>
-
-          <div className="flex justify-between items-center text-[10px] text-stone-500 dark:text-stone-400 px-1 font-mono">
-            <span>Pre-filled credentials below:</span>
-            <span className="text-stone-700 dark:text-stone-200 font-bold">admin / Kuldeep@902285</span>
           </div>
         </div>
 
