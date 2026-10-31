@@ -5,7 +5,7 @@ import { useAuth } from '../context/useAuth';
 export default function AdminLoginModal({ isOpen, onClose, onLoginSuccess }) {
   // Pre-filled by default for instant recruiter & interviewer testing
   const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('Kuldeep@902285');
+  const [password, setPassword] = useState('Admin@Secure2026');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
