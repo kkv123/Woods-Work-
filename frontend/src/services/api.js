@@ -1,6 +1,6 @@
 // API Client for Vishwakarma Woods Work Spring Boot Backend
-// In production, uses VITE_API_BASE_URL or relative '/api' if hosted together; in dev, points to localhost:8080/api
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://localhost:8080/api' : '/api');
+// In production, always use relative '/api' so Vercel proxies directly to AWS EC2 without mixed-content or CORS issues
+const API_BASE_URL = import.meta.env.DEV ? 'http://localhost:8080/api' : '/api';
 
 import { COMPLETED_PROJECTS } from '../data/mockData';
 import { INITIAL_EMPLOYEES, INITIAL_PROJECTS } from './mockFallback';
