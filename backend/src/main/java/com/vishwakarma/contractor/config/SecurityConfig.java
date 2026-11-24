@@ -72,6 +72,9 @@ public class SecurityConfig {
                         // Public quote calculator submission from prospective clients
                         .requestMatchers(HttpMethod.POST, "/api/quotes/**").permitAll()
 
+                        // Public AI Assistant for millwork consultation & digital quotation advice
+                        .requestMatchers("/api/public/ai/**").permitAll()
+
                         // Protected contractor management endpoints (Enterprise JWT required)
                         .requestMatchers("/api/employees/**").authenticated()
                         .requestMatchers("/api/invoices/**").authenticated()

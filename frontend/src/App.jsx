@@ -8,6 +8,7 @@ import CostEstimator from './components/CostEstimator';
 import TestimonialsSection from './components/TestimonialsSection';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
+import MillworkAiWidget from './components/MillworkAiWidget';
 import AdminLoginModal from './components/AdminLoginModal';
 import AdminPortal from './components/AdminPortal';
 import { useAuth } from './context/useAuth';
@@ -96,6 +97,9 @@ export default function App() {
 
       {/* Floating WhatsApp Contact Button */}
       <WhatsAppButton />
+
+      {/* Floating Public AI Millwork Estimator & Consultation Widget */}
+      <MillworkAiWidget />
 
       {/* Admin Portal Modal Trigger */}
       <AdminLoginModal

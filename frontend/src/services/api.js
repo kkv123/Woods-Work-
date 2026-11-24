@@ -437,5 +437,23 @@ export const api = {
     } catch (err) {
       return false;
     }
+  },
+
+  // Public Millwork & Digital Quotation AI Assistant
+  askPublicAi: async (message, sessionId) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/public/ai/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, sessionId })
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+      throw new Error(`Server returned HTTP ${res.status}`);
+    } catch (err) {
+      console.error('Failed to query Public AI:', err);
+      throw err;
+    }
   }
 };

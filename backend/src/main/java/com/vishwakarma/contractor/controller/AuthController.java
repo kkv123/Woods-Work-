@@ -10,6 +10,7 @@ import com.vishwakarma.contractor.repository.UserRepository;
 import com.vishwakarma.contractor.security.JwtTokenProvider;
 import com.vishwakarma.contractor.security.RefreshTokenService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,6 +41,7 @@ public class AuthController {
         this.refreshTokenService = refreshTokenService;
         this.userRepository = userRepository;
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
